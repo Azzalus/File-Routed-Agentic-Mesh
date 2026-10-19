@@ -1,0 +1,12 @@
+{
+  "$schema": "https://schema.okf.org/v1/knowledge.json",
+  "metadata": { "id": "schema-{{ID}}", "domain": "{{DOMAIN}}", "version": "1.0" },
+  "type": "schema",
+  "properties": {
+    "name": "{{SCHEMA_NAME}}",
+    "description": "{{DESCRIPTION}}",
+    "fields": []
+  },
+  "relations": [],
+  "invariants": []
+}

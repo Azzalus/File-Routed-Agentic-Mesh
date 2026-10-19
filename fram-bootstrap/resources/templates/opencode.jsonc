@@ -1,0 +1,149 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "default_agent": "orchestrator",
+  "instructions": [
+    "./AGENTS.md"
+  ],
+  "skills": {
+    "paths": [
+      "./.agents/skills"
+    ]
+  },
+  "provider": {
+    "lmstudio": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "LM Studio (Local)",
+      "options": {
+        "baseURL": "http://localhost:11434/v1",
+        "apiKey": "none"
+      },
+      "models": {
+        "<your-orchestrator-model>": {
+          "name": "LM Studio Orchestrator Model",
+          "supportsToolCalls": true
+        },
+        "<your-investigator-model>": {
+          "name": "LM Studio Investigator Model",
+          "supportsToolCalls": true
+        },
+        "<your-programmer-model>": {
+          "name": "LM Studio Programmer Model",
+          "supportsToolCalls": true
+        }
+      }
+    }
+  },
+  "model": "lmstudio/<your-orchestrator-model>",
+  "shell": "cmd",
+  "permission": {
+    "bash": {
+      "*": "allow",
+      "git push*": "deny",
+      "git reset --hard*": "deny",
+      "git clean*": "deny",
+      "rmdir /s /q*": "ask",
+      "del /f /s /q*": "ask"
+    }
+  },
+  "agent": {
+    "architect": { "disable": true },
+    "builder": { "disable": true },
+    "orchestrator": {
+      "mode": "primary",
+      "description": "FRAM Orchestrator. Reads active-tasks/*/query.md, drafts plans, routes through the Investigator red-team gate, dispatches to the Programmer, and compiles the final answer. Never writes source code.",
+      "model": "lmstudio/<your-orchestrator-model>",
+      "temperature": 0.2,
+      "prompt": "{file:./.profiles/orchestrator.md}",
+      "permission": {
+        "read": "allow",
+        "question": "allow",
+        "todowrite": "allow",
+        "webfetch": "ask",
+        "edit": {
+          "*": "deny",
+          "*active-tasks*query.md": "allow",
+          "*active-tasks*BLACKBOARD.md": "allow"
+        },
+        "bash": {
+          "*": "ask",
+          "git status*": "allow",
+          "git diff*": "allow",
+          "git log*": "allow",
+          "dir*": "allow",
+          "type *": "allow",
+          "findstr *": "allow",
+          "uv run *icm_okf_coupler.py*": "allow",
+          "uv run *validate_gate.py*": "allow",
+          "uv run *compile_agent_context.py*": "allow"
+        }
+      }
+    },
+    "investigator": {
+      "mode": "primary",
+      "description": "FRAM Investigator. Red-teams plans in active-tasks/*/BLACKBOARD.md for logical flaws, edge cases, and security risks. Handles analysis and research.",
+      "model": "lmstudio/<your-investigator-model>",
+      "temperature": 0.0,
+      "prompt": "{file:./.profiles/investigator.md}",
+      "permission": {
+        "read": "allow",
+        "question": "allow",
+        "todowrite": "allow",
+        "webfetch": "deny",
+        "edit": {
+          "*": "deny",
+          "*active-tasks*BLACKBOARD.md": "allow",
+          "*active-tasks*mcp-scratchpad*": "allow"
+        },
+        "bash": {
+          "*": "ask",
+          "dir*": "allow",
+          "type *": "allow",
+          "findstr *": "allow",
+          "dumpbin*": "allow",
+          "strings*": "allow",
+          "python *": "allow",
+          "uv run *": "allow"
+        }
+      }
+    },
+    "programmer": {
+      "mode": "primary",
+      "description": "FRAM Programmer. Reads the approved plan from BLACKBOARD.md, implements code in [task-name]-source/, builds and verifies in [task-name]-output/. Maintains workspace config/skill files.",
+      "model": "lmstudio/<your-programmer-model>",
+      "temperature": 0.5,
+      "prompt": "{file:./.profiles/programmer.md}",
+      "permission": {
+        "read": "allow",
+        "question": "allow",
+        "todowrite": "allow",
+        "webfetch": "ask",
+        "edit": {
+          "*": "deny",
+          "*active-tasks*-source*": "allow",
+          "*active-tasks*-output*": "allow",
+          "*active-tasks*mcp-scratchpad*": "allow",
+          "*active-tasks*BLACKBOARD.md": "allow",
+          "*opencode.jsonc": "allow",
+          "*opencode.json": "allow",
+          "*manifest.yaml": "allow",
+          "*AGENTS.md": "allow",
+          "*.agents*skills*": "allow"
+        },
+        "bash": {
+          "*": "ask",
+          "g++ *": "allow",
+          "gcc *": "allow",
+          "clang *": "allow",
+          "dir*": "allow",
+          "type *": "allow",
+          "findstr *": "allow",
+          "git status*": "allow",
+          "git diff*": "allow",
+          "git log*": "allow",
+          "uv run *": "allow",
+          "python *": "allow"
+        }
+      }
+    }
+  }
+}

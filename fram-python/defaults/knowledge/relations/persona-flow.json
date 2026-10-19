@@ -1,0 +1,15 @@
+{
+  "$schema": "https://schema.okf.org/v1/knowledge.json",
+  "metadata": { "id": "rel-persona-flow", "domain": "fram", "version": "1.0" },
+  "type": "relation",
+  "properties": {
+    "name": "Default Persona Flow",
+    "description": "Standard task workflow: Orchestrator plans, Investigator red-teams, Programmer implements, Orchestrator compiles final answer.",
+    "source": "orchestrator",
+    "target": "programmer",
+    "relation_type": "SEQUENTIAL_WITH_GATE",
+    "gate": "investigator"
+  },
+  "relations": [],
+  "invariants": []
+}

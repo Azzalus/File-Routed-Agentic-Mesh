@@ -1,0 +1,15 @@
+{
+  "$schema": "https://schema.okf.org/v1/knowledge.json",
+  "metadata": { "id": "inv-det-gate", "domain": "fram", "version": "1.0" },
+  "type": "invariant",
+  "properties": {
+    "name": "Deterministic Gate",
+    "description": "No task or stage may complete through probabilistic model assertions alone. Every gate requires a deterministic command returning exit code 0.",
+    "enforced_by": ["orchestrator", "investigator", "programmer"],
+    "violation_action": "block stage completion, require re-verification"
+  },
+  "relations": [
+    { "source": "inv-det-gate", "target": "schema-task-lifecycle", "type": "GOVERNS" }
+  ],
+  "invariants": []
+}

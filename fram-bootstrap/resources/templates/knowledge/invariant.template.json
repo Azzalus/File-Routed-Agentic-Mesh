@@ -1,0 +1,13 @@
+{
+  "$schema": "https://schema.okf.org/v1/knowledge.json",
+  "metadata": { "id": "inv-{{ID}}", "domain": "{{DOMAIN}}", "version": "1.0" },
+  "type": "invariant",
+  "properties": {
+    "name": "{{INVARIANT_NAME}}",
+    "description": "{{DESCRIPTION}}",
+    "enforced_by": [],
+    "violation_action": "{{VIOLATION_ACTION}}"
+  },
+  "relations": [],
+  "invariants": []
+}

@@ -1,0 +1,14 @@
+{
+  "$schema": "https://schema.okf.org/v1/knowledge.json",
+  "metadata": { "id": "con-{{ID}}", "domain": "{{DOMAIN}}", "version": "1.0" },
+  "type": "constraint",
+  "properties": {
+    "name": "{{CONSTRAINT_NAME}}",
+    "description": "{{DESCRIPTION}}",
+    "scope": "{{SCOPE}}",
+    "value": "{{VALUE}}",
+    "enforced_by": []
+  },
+  "relations": [],
+  "invariants": []
+}

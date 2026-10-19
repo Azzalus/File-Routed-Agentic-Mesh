@@ -1,0 +1,15 @@
+{
+  "$schema": "https://schema.okf.org/v1/knowledge.json",
+  "metadata": { "id": "inv-blackboard", "domain": "fram", "version": "1.0" },
+  "type": "invariant",
+  "properties": {
+    "name": "Blackboard Protocol",
+    "description": "Agents do not communicate directly. All inter-agent communication happens through BLACKBOARD.md. Each agent reads the blackboard before acting and writes findings after completing work.",
+    "enforced_by": ["orchestrator", "investigator", "programmer"],
+    "violation_action": "halt task, redirect communication to BLACKBOARD.md"
+  },
+  "relations": [
+    { "source": "inv-blackboard", "target": "schema-fram-layout", "type": "GOVERNS" }
+  ],
+  "invariants": []
+}

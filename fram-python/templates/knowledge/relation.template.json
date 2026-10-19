@@ -1,0 +1,14 @@
+{
+  "$schema": "https://schema.okf.org/v1/knowledge.json",
+  "metadata": { "id": "rel-{{ID}}", "domain": "{{DOMAIN}}", "version": "1.0" },
+  "type": "relation",
+  "properties": {
+    "name": "{{RELATION_NAME}}",
+    "description": "{{DESCRIPTION}}",
+    "source": "{{SOURCE_ENTITY}}",
+    "target": "{{TARGET_ENTITY}}",
+    "relation_type": "{{RELATION_TYPE}}"
+  },
+  "relations": [],
+  "invariants": []
+}

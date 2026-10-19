@@ -1,0 +1,91 @@
+manifest_version: "2.0"
+project_name: "<your-project-name>"
+
+provider_config:
+  lmstudio:
+    type: local
+    base_url: "http://localhost:11434/v1"
+    api_key_env: null
+    models: {}
+
+personas:
+  orchestrator:
+    role: "Orchestration, planning, routing, final compilation"
+    provider: "lmstudio"
+    model: "<your-orchestrator-model>"
+    temperature: 0.2
+    prompt_path: ".profiles/orchestrator.md"
+    permissions:
+      read: "allow"
+      edit:
+        "*active-tasks*query.md": "allow"
+        "*active-tasks*BLACKBOARD.md": "allow"
+      bash:
+        "dir*": "allow"
+        "git status*": "allow"
+        "git diff*": "allow"
+        "uv run *validate*": "allow"
+  investigator:
+    role: "Plan red-team review, analysis, risk assessment"
+    provider: "lmstudio"
+    model: "<your-investigator-model>"
+    temperature: 0.0
+    prompt_path: ".profiles/investigator.md"
+    permissions:
+      read: "allow"
+      edit:
+        "*active-tasks*BLACKBOARD.md": "allow"
+        "*active-tasks*mcp-scratchpad*": "allow"
+      bash:
+        "dir*": "allow"
+        "dumpbin*": "allow"
+        "python *": "allow"
+        "uv run *": "allow"
+        "strings*": "allow"
+  programmer:
+    role: "Implementation, build, verification"
+    provider: "lmstudio"
+    model: "<your-programmer-model>"
+    temperature: 0.5
+    prompt_path: ".profiles/programmer.md"
+    permissions:
+      read: "allow"
+      edit:
+        "*active-tasks*-source*": "allow"
+        "*active-tasks*-output*": "allow"
+        "*active-tasks*BLACKBOARD.md": "allow"
+        "*active-tasks*mcp-scratchpad*": "allow"
+      bash:
+        "g++ *": "allow"
+        "gcc *": "allow"
+        "clang *": "allow"
+        "dir*": "allow"
+        "git status*": "allow"
+        "uv run *": "allow"
+        "python *": "allow"
+
+skills:
+  - name: "icm-okf-gates"
+    trigger: "workspace initialization, ICM coupling, deterministic gates"
+    path: ".agents/skills/icm-okf-gates"
+    entry_script: "scripts/icm_okf_coupler.py"
+    expanded_prompt: ".agents/skills/icm-okf-gates/SKILL.md"
+    knowledge_refs:
+      - "knowledge/schemas/fram-layout.json"
+      - "knowledge/invariants/sandbox-rule.json"
+
+tools: []
+
+environment_policies:
+  allowed_read_paths:
+    - "active-tasks/shared-software/"
+    - "active-tasks/*/target-software/"
+    - "active-tasks/*/*-source/"
+    - "active-tasks/*/*-output/"
+    - ".profiles/"
+  allowed_write_paths:
+    - "active-tasks/*/BLACKBOARD.md"
+    - "active-tasks/*/*-source/"
+    - "active-tasks/*/*-output/"
+    - "active-tasks/*/mcp-scratchpad/"
+  sandbox_execution: true

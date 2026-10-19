@@ -1,0 +1,17 @@
+{
+  "$schema": "https://schema.okf.org/v1/knowledge.json",
+  "metadata": { "id": "schema-task-lifecycle", "domain": "fram", "version": "1.0" },
+  "type": "schema",
+  "properties": {
+    "name": "FRAM Task Lifecycle",
+    "description": "The 4-stage task workflow with Investigator red-team gate.",
+    "fields": [
+      { "stage": "01_planning", "owner": "orchestrator", "description": "Read query.md, draft plan, write to BLACKBOARD.md" },
+      { "stage": "02_red_team", "owner": "investigator", "description": "Review plan, flag gaps/risks, revise in BLACKBOARD.md" },
+      { "stage": "03_implementation", "owner": "programmer", "description": "Implement from approved plan in *-source/, build in *-output/" },
+      { "stage": "04_compilation", "owner": "orchestrator", "description": "Compile final answer from BLACKBOARD.md + output/ results" }
+    ]
+  },
+  "relations": [],
+  "invariants": ["inv-det-gate"]
+}

@@ -1,0 +1,24 @@
+{
+  "$schema": "https://schema.okf.org/v1/knowledge.json",
+  "metadata": { "id": "schema-fram-layout", "domain": "fram", "version": "1.0" },
+  "type": "schema",
+  "properties": {
+    "name": "FRAM Workspace Layout",
+    "description": "The canonical File-Routed Agentic Mesh directory structure.",
+    "fields": [
+      { "name": "AGENTS.md", "role": "Layer 0: Workspace identity and hard rules" },
+      { "name": "manifest.yaml", "role": "Layer 1: OKF persona registry + skill catalog + tool defs" },
+      { "name": "opencode.jsonc", "role": "Runtime binding: agent routing and permissions" },
+      { "name": ".profiles/", "role": "Full persona prompt files (loaded on-demand)" },
+      { "name": "active-tasks/", "role": "Task execution environment" },
+      { "name": "active-tasks/shared-software/", "role": "READ-ONLY shared binaries" },
+      { "name": "active-tasks/<task>/query.md", "role": "User's task contract" },
+      { "name": "active-tasks/<task>/BLACKBOARD.md", "role": "Inter-agent communication" },
+      { "name": "active-tasks/<task>/knowledge/", "role": "Per-task OKF knowledge" },
+      { "name": "active-tasks/<task>/<task>-source/", "role": "DEVELOPMENT: mutable source" },
+      { "name": "active-tasks/<task>/<task>-output/", "role": "EXECUTION: build and verify" }
+    ]
+  },
+  "relations": [],
+  "invariants": ["inv-sandbox", "inv-blackboard"]
+}

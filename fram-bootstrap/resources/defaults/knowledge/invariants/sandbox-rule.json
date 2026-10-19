@@ -1,0 +1,15 @@
+{
+  "$schema": "https://schema.okf.org/v1/knowledge.json",
+  "metadata": { "id": "inv-sandbox", "domain": "fram", "version": "1.0" },
+  "type": "invariant",
+  "properties": {
+    "name": "Sandbox Rule",
+    "description": "shared-software/ and target-software/ are READ-ONLY for all personas. Copy or read only, never modify, delete, or rewrite.",
+    "enforced_by": ["orchestrator", "investigator", "programmer"],
+    "violation_action": "halt task, report to user"
+  },
+  "relations": [
+    { "source": "inv-sandbox", "target": "schema-fram-layout", "type": "CONSTRAINS" }
+  ],
+  "invariants": []
+}
