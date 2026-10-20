@@ -60,6 +60,10 @@ new file creation).
 - `<target>/active-tasks/shared-software/`
 - `<target>/.agents/skills/icm-okf-gates/scripts/`
 - `<target>/.agents/skills/icm-okf-gates/resources/templates/knowledge/`
+- `<target>/.agents/skills/grilling/`
+- `<target>/.agents/skills/vocabulary/scripts/`
+- `<target>/.agents/skills/vocabulary/fixtures/`
+- `<target>/.agents/skills/vocabulary/resources/`
 
 ### Step B — Copy bundled payload (exact mappings)
 
@@ -85,6 +89,17 @@ new file creation).
 | `defaults/knowledge/relations/persona-flow.json` | `<target>/knowledge/relations/persona-flow.json` |
 | `defaults/knowledge/schemas/fram-layout.json` | `<target>/knowledge/schemas/fram-layout.json` |
 | `defaults/knowledge/schemas/task-lifecycle.json` | `<target>/knowledge/schemas/task-lifecycle.json` |
+| `defaults/knowledge/schemas/workspace-vocabulary.json` | `<target>/knowledge/schemas/workspace-vocabulary.json` |
+| `defaults/knowledge/invariants/ste-consistency.json` | `<target>/knowledge/invariants/ste-consistency.json` |
+| `templates/skills/grilling/SKILL.md` | `<target>/.agents/skills/grilling/SKILL.md` |
+| `templates/skills/vocabulary/SKILL.md` | `<target>/.agents/skills/vocabulary/SKILL.md` |
+| `templates/skills/vocabulary/scripts/conformance_checker.py` | `<target>/.agents/skills/vocabulary/scripts/conformance_checker.py` |
+| `templates/skills/vocabulary/scripts/grilling_suite_gate_policy.json` | `<target>/.agents/skills/vocabulary/scripts/grilling_suite_gate_policy.json` |
+| `templates/skills/vocabulary/resources/vocabulary-task.template.json` | `<target>/.agents/skills/vocabulary/resources/vocabulary-task.template.json` |
+| `templates/skills/vocabulary/fixtures/vocabulary.json` | `<target>/.agents/skills/vocabulary/fixtures/vocabulary.json` |
+| `templates/skills/vocabulary/fixtures/artifact-good.md` | `<target>/.agents/skills/vocabulary/fixtures/artifact-good.md` |
+| `templates/skills/vocabulary/fixtures/grilling-log-good.json` | `<target>/.agents/skills/vocabulary/fixtures/grilling-log-good.json` |
+| `templates/skills/vocabulary/fixtures/mutations.json` | `<target>/.agents/skills/vocabulary/fixtures/mutations.json` |
 
 ### Step C — Write generated files (new content, from the constants below)
 
@@ -100,6 +115,7 @@ new file creation).
 - `invariants/sandbox-rule.json` — Sandbox Rule (READ-ONLY sandboxes)
 - `invariants/deterministic-gate.json` — Deterministic Gate (exit code 0)
 - `invariants/blackboard-protocol.json` — Blackboard Protocol (inter-agent comms)
+- `invariants/ste-consistency.json` — STE Consistency (canonical terms, one meaning per sentence)
 
 ## Relations
 - `relations/persona-flow.json` — Default persona workflow
@@ -107,6 +123,7 @@ new file creation).
 ## Schemas
 - `schemas/fram-layout.json` — FRAM workspace directory structure
 - `schemas/task-lifecycle.json` — 4-stage task lifecycle
+- `schemas/workspace-vocabulary.json` — Controlled workspace vocabulary catalog
 ````
 
 `<target>/.agents/skills/icm-okf-gates/SKILL.md` content:
@@ -188,10 +205,18 @@ All of the following must exist under `<target>`:
 - `knowledge/relations/persona-flow.json`
 - `knowledge/schemas/fram-layout.json`
 - `knowledge/schemas/task-lifecycle.json`
+- `knowledge/schemas/workspace-vocabulary.json`
+- `knowledge/invariants/ste-consistency.json`
 - `.agents/skills/icm-okf-gates/scripts/icm_okf_coupler.py`
 - `.agents/skills/icm-okf-gates/scripts/system-start.py`
 - `.agents/skills/icm-okf-gates/resources/templates/knowledge/` (4 template JSON files)
 - `.agents/skills/icm-okf-gates/resources/templates/README-HARNESS.template.md`
+- `.agents/skills/grilling/SKILL.md`
+- `.agents/skills/vocabulary/SKILL.md`
+- `.agents/skills/vocabulary/scripts/conformance_checker.py`
+- `.agents/skills/vocabulary/scripts/grilling_suite_gate_policy.json`
+- `.agents/skills/vocabulary/resources/vocabulary-task.template.json`
+- `.agents/skills/vocabulary/fixtures/` (4 fixture files)
 - `active-tasks/shared-software/` (directory)
 
 ### Config sanity

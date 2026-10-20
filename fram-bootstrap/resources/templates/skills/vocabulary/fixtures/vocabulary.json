@@ -1,0 +1,7 @@
+{
+  "terms": [
+    {"canonical": "frontier", "definition": "The set of open decisions whose prerequisites are settled.", "avoid": ["queue", "backlog"], "source_task": "workspace"},
+    {"canonical": "workspace", "definition": "The FRAM root directory that holds Layer 0 and Layer 1.", "avoid": ["repo-root", "project-dir"], "source_task": "workspace"},
+    {"canonical": "round", "definition": "One batch of frontier questions put to the user.", "avoid": ["pass", "cycle"], "source_task": "workspace"}
+  ]
+}

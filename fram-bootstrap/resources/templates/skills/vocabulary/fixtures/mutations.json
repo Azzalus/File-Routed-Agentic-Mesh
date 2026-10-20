@@ -1,0 +1,71 @@
+{
+  "fixtures": "Six negative fixtures, one per AC4 sub-check (a)-(f).",
+  "mutations": [
+    {
+      "id": "mutation-a-unknown-term",
+      "rule": "AC4(a)-unknown-term",
+      "kind": "artifact",
+      "text": "The Frontier holds a Zmartful decision.",
+      "note": "AC4(a) unknown term: 'Zmartful' is a coined domain term that is not a canonical term."
+    },
+    {
+      "id": "mutation-b-avoid-synonym",
+      "rule": "AC4(b)-avoid-synonym",
+      "kind": "artifact",
+      "text": "The queue lists every open decision.",
+      "note": "AC4(b) avoided synonym: 'queue' is an _Avoid_ synonym of 'frontier'."
+    },
+    {
+      "id": "mutation-c-long-passive",
+      "rule": "AC4(c)-ste-sentence-length",
+      "kind": "artifact",
+      "text": "Every open decision in the frontier is written by the agent in this deliberately overlong sentence that exceeds twenty words for the test.",
+      "note": "AC4(c) STE form: over-long and passive sentence."
+    },
+    {
+      "id": "mutation-d-empty-rounds",
+      "rule": "AC4(d)-round-before-finalize",
+      "kind": "log",
+      "log": {"rounds": [], "drift": [], "finalized_after_round": true},
+      "note": "AC4(d) round-completion: no round ran before finalization."
+    },
+    {
+      "id": "mutation-e-no-manual-response",
+      "rule": "AC4(e)-manual-response",
+      "kind": "log",
+      "log": {
+        "rounds": [
+          {
+            "q_number": 1,
+            "questions": [
+              {"id": "Q1.1", "text": "x", "options": ["yes"], "has_manual_response": false}
+            ]
+          }
+        ],
+        "drift": [],
+        "finalized_after_round": true
+      },
+      "note": "AC4(e) manual-response: a question lacks the manual-response option."
+    },
+    {
+      "id": "mutation-f-structural-drift-no-halt",
+      "rule": "AC4(f)-structural-halt",
+      "kind": "log",
+      "log": {
+        "rounds": [
+          {
+            "q_number": 1,
+            "questions": [
+              {"id": "Q1.1", "text": "x", "options": ["yes"], "has_manual_response": true}
+            ]
+          }
+        ],
+        "drift": [
+          {"tier": "structural", "detected_at_round": 1, "response": "q2", "user_explained": true}
+        ],
+        "finalized_after_round": true
+      },
+      "note": "AC4(f) drift: structural-tier drift responded 'q2' instead of halt."
+    }
+  ]
+}

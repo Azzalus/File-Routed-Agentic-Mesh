@@ -86,7 +86,18 @@ def install_engine(target: Path) -> List[str]:
             if copy_file(entity_file, sub_dst / entity_file.name):
                 installed.append(f"knowledge/{sub}/{entity_file.name}")
 
-    # 7. Copy SKILL.md (create a minimal one if not present)
+    # 7. Copy skill payloads to .agents/skills/
+    skills_src = INSTALLER_DIR / "templates" / "skills"
+    skills_dst = target / ".agents" / "skills"
+    if skills_src.exists():
+        skills_dst.mkdir(parents=True, exist_ok=True)
+        for skill_file in skills_src.rglob("*"):
+            if skill_file.is_file():
+                rel = skill_file.relative_to(skills_src)
+                if copy_file(skill_file, skills_dst / rel):
+                    installed.append(f".agents/skills/{rel.as_posix()}")
+
+    # 8. Copy SKILL.md (create a minimal one if not present)
     skill_md = target / ".agents" / "skills" / "icm-okf-gates" / "SKILL.md"
     if not skill_md.exists():
         skill_md.parent.mkdir(parents=True, exist_ok=True)

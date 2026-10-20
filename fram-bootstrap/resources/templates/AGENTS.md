@@ -54,6 +54,7 @@ Hard rules to prevent agents from stepping on each other or getting lost:
     2. The *Programmer* reads the information to write tools or software.
     3. The *Orchestrator* checks this file to see who is finished.
 *   **The Deterministic Gate:** No task or stage may complete through probabilistic model assertions alone. Every gate requires a deterministic command returning exit code 0.
+*   **Layer 0/1 Conditional-Edit Rule:** Layer 0/1 files (`AGENTS.md`, `manifest.yaml`, `opencode.jsonc`) may be edited by an agent only when (a) the user has defined the new entries beforehand and (b) the user has explicitly authorized the edit. The runtime `edit` patterns for those files are gated `"ask"` in `opencode.jsonc`, so no such edit can happen silently.
 
 # Project Context & Agent Rules
 

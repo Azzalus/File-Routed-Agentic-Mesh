@@ -1,0 +1,22 @@
+{
+  "$schema": "https://schema.okf.org/v1/knowledge.json",
+  "metadata": {
+    "id": "schema-task-vocabulary",
+    "domain": "fram",
+    "version": "1.0",
+    "template": true
+  },
+  "type": "schema",
+  "properties": {
+    "name": "Per-Task Vocabulary",
+    "description": "Task-scoped controlled vocabulary. A per-task term shadows the workspace term for this task only (D4). Promote a term to the workspace catalog at Stage 04.",
+    "fields": [
+      {"name": "terms", "role": "List of canonical terms: {canonical, definition, avoid[], source_task}"}
+    ],
+    "terms": []
+  },
+  "relations": [
+    {"source": "schema-task-vocabulary", "target": "schema-workspace-vocabulary", "type": "SHADOWS"}
+  ],
+  "invariants": ["inv-ste"]
+}

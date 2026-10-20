@@ -55,6 +55,13 @@ personas:
         "*active-tasks*-output*": "allow"
         "*active-tasks*BLACKBOARD.md": "allow"
         "*active-tasks*mcp-scratchpad*": "allow"
+        "*.agents*skills*": "allow"
+        "knowledge/*": "allow"
+        "*active-tasks*/knowledge/*": "allow"
+        "*opencode.jsonc": "ask"
+        "*opencode.json": "ask"
+        "*manifest.yaml": "ask"
+        "*AGENTS.md": "ask"
       bash:
         "g++ *": "allow"
         "gcc *": "allow"
@@ -73,6 +80,19 @@ skills:
     knowledge_refs:
       - "knowledge/schemas/fram-layout.json"
       - "knowledge/invariants/sandbox-rule.json"
+  - name: "grilling"
+    trigger: "plan interview, frontier questions, grilling phase, clarify design"
+    path: ".agents/skills/grilling"
+    expanded_prompt: ".agents/skills/grilling/SKILL.md"
+    knowledge_refs:
+      - "knowledge/schemas/task-lifecycle.json"
+  - name: "vocabulary"
+    trigger: "controlled vocabulary, STE consistency, term capture, glossary"
+    path: ".agents/skills/vocabulary"
+    expanded_prompt: ".agents/skills/vocabulary/SKILL.md"
+    knowledge_refs:
+      - "knowledge/schemas/workspace-vocabulary.json"
+      - "knowledge/invariants/ste-consistency.json"
 
 tools: []
 
@@ -88,4 +108,6 @@ environment_policies:
     - "active-tasks/*/*-source/"
     - "active-tasks/*/*-output/"
     - "active-tasks/*/mcp-scratchpad/"
+    - "knowledge/"
+    - "active-tasks/*/knowledge/"
   sandbox_execution: true

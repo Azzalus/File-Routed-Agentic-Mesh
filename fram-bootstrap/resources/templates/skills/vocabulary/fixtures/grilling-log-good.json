@@ -1,0 +1,17 @@
+{
+  "rounds": [
+    {
+      "q_number": 1,
+      "questions": [
+        {
+          "id": "Q1.1",
+          "text": "Does the workspace own the vocabulary?",
+          "options": ["yes", "per-task only"],
+          "has_manual_response": true
+        }
+      ]
+    }
+  ],
+  "drift": [],
+  "finalized_after_round": true
+}

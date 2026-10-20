@@ -11,7 +11,8 @@ two independent ways to bootstrap a complete File-Routed Agentic Mesh workspace:
 Both methods produce the same FRAM workspace scaffold (identical file inventory):
 `AGENTS.md`, `manifest.yaml`, `opencode.jsonc`, `.profiles/` persona prompts
 (orchestrator, investigator, programmer), the `knowledge/` OKF catalog,
-`system-start.py`, and the bundled `icm-okf-gates` skill.
+`system-start.py`, and the bundled `icm-okf-gates`, `grilling`, and `vocabulary`
+skills.
 
 **TL;DR:**
 ```bash
@@ -180,10 +181,12 @@ workspace and self-check the result.
    `resources/templates/` directory.
 4. **Copies default OKF knowledge entities** — invariants, relations, and schemas —
    into `knowledge/`.
-5. **Runs the coupler in `init` mode**: detects the target's state, generates
+5. **Copies skill payloads** — the `grilling` and `vocabulary` skills (with the
+   conformance checker, fixtures, and gate-policy bundle) land in `.agents/skills/`.
+6. **Runs the coupler in `init` mode**: detects the target's state, generates
    `AGENTS.md`, `manifest.yaml`, `opencode.jsonc`, writes `knowledge/index.md`, and
    creates the `active-tasks/shared-software/` sandbox directory.
-6. **Runs the coupler in `self-check` mode**: verifies every required file exists and
+7. **Runs the coupler in `self-check` mode**: verifies every required file exists and
    is valid, and returns **exit code 0** only on success.
 
 #### Post-install configuration
@@ -253,10 +256,12 @@ The agent then:
    never overwriting existing files (conflicts are recorded and reported); complete →
    stop with "already bootstrapped".
 2. **Creates the folder structure** — `.profiles/`, `knowledge/` subfolders,
-   `active-tasks/shared-software/`, and the `icm-okf-gates` skill tree.
+   `active-tasks/shared-software/`, and the `icm-okf-gates`, `grilling`, and
+   `vocabulary` skill trees.
 3. **Copies the bundled payload** — engine scripts, persona templates, OKF knowledge
-   templates/defaults, and the config skeletons (`AGENTS.md`, `manifest.yaml`,
-   `opencode.jsonc`) using exact source→destination mappings (see `SKILL.md` §3).
+   templates/defaults, skill payloads, and the config skeletons (`AGENTS.md`,
+   `manifest.yaml`, `opencode.jsonc`) using exact source→destination mappings (see
+   `SKILL.md` §3).
 4. **Writes generated files** — `knowledge/index.md` and the minimal
    `.agents/skills/icm-okf-gates/SKILL.md` marker.
 5. **Verifies deterministically** — a file inventory checklist (every required file
@@ -306,7 +311,7 @@ File-Routed-Agentic-Mesh/
 ├── fram-python/                  Method 1: Python installer (no dependencies)
 │   ├── setup.py                  Raw-Python installer entry point
 │   ├── bin/                      FRAM engine (icm_okf_coupler_v2.py, system-start-v2.py)
-│   ├── templates/                Persona prompts, OKF templates, README-HARNESS template
+│   ├── templates/                Persona prompts, OKF templates, skills, README-HARNESS template
 │   └── defaults/                 Default OKF knowledge entities
 └── fram-bootstrap/               Method 2: skill command (no Python)
     ├── SKILL.md                  Skill instructions + scaffold procedure

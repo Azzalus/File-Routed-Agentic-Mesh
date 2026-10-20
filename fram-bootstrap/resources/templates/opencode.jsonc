@@ -123,11 +123,13 @@
           "*active-tasks*-output*": "allow",
           "*active-tasks*mcp-scratchpad*": "allow",
           "*active-tasks*BLACKBOARD.md": "allow",
-          "*opencode.jsonc": "allow",
-          "*opencode.json": "allow",
-          "*manifest.yaml": "allow",
-          "*AGENTS.md": "allow",
-          "*.agents*skills*": "allow"
+          "*.agents*skills*": "allow",
+          "knowledge/*": "allow",
+          "*active-tasks*/knowledge/*": "allow",
+          "*opencode.jsonc": "ask",
+          "*opencode.json": "ask",
+          "*manifest.yaml": "ask",
+          "*AGENTS.md": "ask"
         },
         "bash": {
           "*": "ask",

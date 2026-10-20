@@ -1,0 +1,15 @@
+{
+  "$schema": "https://schema.okf.org/v1/knowledge.json",
+  "metadata": { "id": "inv-ste", "domain": "fram", "version": "1.0" },
+  "type": "invariant",
+  "properties": {
+    "name": "STE Consistency",
+    "description": "User-facing output uses one canonical term per concept, one sentence per meaning, active voice, and never an _Avoid_ synonym. STE wording rules apply only to outputs forwarded directly to the user (D5).",
+    "enforced_by": ["orchestrator"],
+    "violation_action": "block user-facing output, route through the vocabulary conformance checker"
+  },
+  "relations": [
+    { "source": "inv-ste", "target": "schema-workspace-vocabulary", "type": "CONSTRAINS" }
+  ],
+  "invariants": []
+}
