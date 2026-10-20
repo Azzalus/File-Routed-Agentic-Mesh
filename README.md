@@ -1,3 +1,6 @@
+CREATORS NOTE:
+this is a heavy WIP, and is for my own self usage whenever i decide to try and use some clankers to do something (which is literally never). if you use this and its broken or breaks something on your machine, its your own damn fault and not mine. dont ask me to fix it.
+
 # File-Routed Agentic Mesh (FRAM)
 
 A GitHub-ready distribution of the FRAM workspace installer. This repo combines
