@@ -1,3 +1,7 @@
+# note from creator
+
+this shit is something i made for fun just to understand llm's. im not maintaining it or fixing reported issues. if you use it and theres issues or it destroys your computer, its your problem not mine.
+
 # File-Routed Agentic Mesh (FRAM)
 
 A GitHub-ready distribution of the FRAM workspace installer. This repo combines
@@ -50,7 +54,7 @@ a multi-agent framework. FRAM layers a **persona registry**, **OKF knowledge
 entities**, and **deterministic verification gates** on top of that idea to produce a
 self-contained, inspectable, human-in-the-loop workspace.
 
-Core concepts, one line each:
+Core concepts:
 
 - **Layer 0 — `AGENTS.md`** — workspace identity and hard rules; every agent and
   harness reads it first.
