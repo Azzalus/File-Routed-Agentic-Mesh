@@ -86,7 +86,8 @@ def install_engine(target: Path) -> List[str]:
             if copy_file(entity_file, sub_dst / entity_file.name):
                 installed.append(f"knowledge/{sub}/{entity_file.name}")
 
-    # 7. Copy skill payloads to .agents/skills/
+    # 7. Copy bundled skill payloads to .agents/skills/ (recursive; preserves subdirectories)
+    print("    Step 7: Copying bundled skills (grilling, vocabulary, ...) to .agents/skills/ ...")
     skills_src = INSTALLER_DIR / "templates" / "skills"
     skills_dst = target / ".agents" / "skills"
     if skills_src.exists():
@@ -98,6 +99,7 @@ def install_engine(target: Path) -> List[str]:
                     installed.append(f".agents/skills/{rel.as_posix()}")
 
     # 8. Copy SKILL.md (create a minimal one if not present)
+    print("    Step 8: Ensuring icm-okf-gates SKILL.md ...")
     skill_md = target / ".agents" / "skills" / "icm-okf-gates" / "SKILL.md"
     if not skill_md.exists():
         skill_md.parent.mkdir(parents=True, exist_ok=True)

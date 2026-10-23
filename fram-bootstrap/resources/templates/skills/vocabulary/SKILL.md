@@ -9,12 +9,12 @@ description: >-
 # vocabulary - Controlled Vocabulary and STE Consistency
 
 Use this skill to capture resolved terms, keep one canonical term per concept, and
-verify user-facing output. This skill owns D-L5 (STE rules) and the D-L6 checker.
+verify user-facing output. This skill owns the STE rules and the conformance checker.
 
-## STE Consistency Rules (D-L5)
+## STE Consistency Rules
 
 Apply these rules to user-facing output only. Internal agent communication
-(`BLACKBOARD.md`, `mcp-scratchpad/` logs) is exempt (D5).
+(`BLACKBOARD.md`, `mcp-scratchpad/` logs) is exempt.
 
 1. Use one canonical term for one concept. Never use a rejected synonym.
 2. Write one meaning per sentence. One sentence carries one instruction.
@@ -30,7 +30,7 @@ Apply these rules to user-facing output only. Internal agent communication
 - **Capture project terms only.** Do not capture generic programming concepts.
 - **No implementation details.** The definition states the concept, not the code.
 
-## Precedence (D4)
+## Precedence
 
 A per-task term shadows the workspace term for that task only. Promote a task term
 to the workspace catalog at Stage 04.
@@ -63,7 +63,7 @@ Both entities conform to `$schema: https://schema.okf.org/v1/knowledge.json`.
 }
 ```
 
-## The Conformance Checker (D-L6)
+## The Conformance Checker
 
 Run the checker to verify output. The checker is deterministic and returns exit code
 0 on PASS and 1 on FAIL.
@@ -72,32 +72,23 @@ Run the checker to verify output. The checker is deterministic and returns exit 
 # Contract self-test
 uv run .agents/skills/vocabulary/scripts/conformance_checker.py --self-test
 
-# Run the six AC4 negative fixtures
+# Run the six negative fixtures
 uv run .agents/skills/vocabulary/scripts/conformance_checker.py --mutation-test .agents/skills/vocabulary/fixtures
 
-# Lint one artifact against the vocabulary (AC4 a-c)
+# Lint one artifact against the vocabulary
 uv run .agents/skills/vocabulary/scripts/conformance_checker.py --lint --artifact <path> --vocabulary knowledge/schemas/workspace-vocabulary.json
 
-# Lint the grilling log and assert the skill mandate (AC4 d-f)
+# Lint the grilling log and assert the skill mandate
 uv run .agents/skills/vocabulary/scripts/conformance_checker.py --lint --log active-tasks/<task>/mcp-scratchpad/grilling-log.json --mandate .agents/skills/grilling/SKILL.md
 
-# Pre-existing mode: report but never fail (R33)
+# Pre-existing mode: report but never fail
 uv run .agents/skills/vocabulary/scripts/conformance_checker.py --preexisting --artifact query.md
 ```
 
 The checker prints one `VIOLATION: <rule>` line per failure. A traceback is not a
 detection.
 
-## Gate Policy Bundle (D-L7)
-
-`scripts/grilling_suite_gate_policy.json` holds the gate policy for
-`validate_gate.py`. The bundle uses the `{"data": ..., "policy": ...}` envelope that
-`validate_gate.py` unwraps. **Dependency:** the bundle needs a workspace whose
-`icm-okf-gates/scripts/` contains `validate_gate.py`. The repo and both installers do
-not ship `validate_gate.py`, so a repo-only install ships the bundle without a
-runner.
-
-## Language-Delimiter Map (OD3a)
+## Language-Delimiter Map
 
 Comments are allowed in all source files. Delimiter characters only delimit comments.
 Comment content must not collide with the delimiter syntax. The checker strips

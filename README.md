@@ -1,6 +1,3 @@
-CREATORS NOTE:
-this is a heavy WIP, and is for my own self usage whenever i decide to try and use some clankers to do something (which is literally never). if you use this and its broken or breaks something on your machine, its your own damn fault and not mine. dont ask me to fix it.
-
 # File-Routed Agentic Mesh (FRAM)
 
 A GitHub-ready distribution of the FRAM workspace installer. This repo combines
@@ -20,13 +17,15 @@ skills.
 **TL;DR:**
 ```bash
 # Method 1 (Python)
-mkdir -p ~/my-workspace
-cd fram-python
-python setup.py --target ~/my-workspace --non-interactive
+mkdir fram-workspace
+python fram-python\setup.py --target fram-workspace --non-interactive
 
 # Method 2 (skill command)
 #   install fram-bootstrap/ as a skill, then type /fram-bootstrap in your agent
 ```
+
+Full install instructions, verification commands, and a first-use smoke task:
+[INSTALL.md](INSTALL.md).
 
 ---
 
@@ -124,183 +123,34 @@ Core concepts, one line each:
 
 ## Part 3 — Installing a FRAM workspace
 
-There are two ways to install. Both create the same scaffold; pick the one that
-matches your environment.
+Full instructions for both methods — prerequisites, flags, verification commands,
+and the first-use smoke task — live in **[INSTALL.md](INSTALL.md)**. Quick start:
 
-### Section A — Method 1: Python installer (`fram-python/`)
-
-The Python installer is a single raw-Python script, `setup.py`, with **no third-party
-dependencies**. It copies the FRAM engine, persona templates, and OKF knowledge
-defaults into a target directory, then runs the coupling engine to initialize the
-workspace and self-check the result.
-
-#### Prerequisites
-
-- **Python 3.8+** — standard library only. No `pip install` step, no `requirements.txt`,
-  no virtual environment required.
-- **(Optional) `uv`** — if `uv` is on your `PATH`, the installer uses it to run the
-  coupler with `pyyaml` auto-provisioned. If `uv` is not present, plain Python is used
-  and the coupler falls back to a built-in minimal YAML writer — either way, no manual
-  dependency setup.
-
-#### Step-by-step
-
-1. **Copy the repo** (or just the `fram-python/` folder) to the machine where the
-   workspace will live.
-2. **Create the target directory** — the installer installs *into* an existing
-   directory and will exit with an error if the target does not exist:
+1. **Choose a method** — Python installer (`fram-python/`) or skill command
+   (`fram-bootstrap/`); both produce the same scaffold, including the bundled
+   `icm-okf-gates`, `grilling`, and `vocabulary` skills.
+2. **Method 1 (Python):** create the target, then run the installer from the
+   repository root:
    ```bash
-   mkdir ~/my-workspace
+   mkdir fram-workspace
+   python fram-python\setup.py --target fram-workspace --non-interactive
    ```
-3. **Run the installer**:
-   ```bash
-   # Install into the current directory
-   python setup.py
+3. **Method 2 (skill):** copy `fram-bootstrap/` into your harness's skills directory
+   (global) or into the project's `.agents/skills/` (per-project), then type
+   `/fram-bootstrap` and name the target directory (for example `fram-workspace`).
+4. **Configure:** edit `manifest.yaml` (set `project_name` and replace each
+   `<your-<persona>-model>` placeholder) and `opencode.jsonc` (provider `baseURL`,
+   model placeholders, top-level `"model"` default).
+5. **Verify** (from the workspace root):
+   `python .agents\skills\icm-okf-gates\scripts\icm_okf_coupler.py --mode self-check`
+   must return exit code 0.
+6. **Boot** (from the workspace root):
+   `uv run --with pyyaml python system-start.py`.
+7. **Create your first task:** `active-tasks/<task-name>/query.md`, then start your
+   harness in the workspace root.
 
-   # Install into a specific directory (non-interactive, accepts all defaults)
-   python setup.py --target ~/my-workspace --non-interactive
-
-   # Install with interactive persona interview (no --non-interactive)
-   python setup.py --target ~/my-workspace
-   ```
-4. **Flags**:
-   - `--target <path>` — where to install (default: current directory). Must exist.
-   - `--non-interactive` — skip the interactive persona interview; writes the default
-     persona/model skeleton.
-   - `--harness {opencode,generic}` — `opencode` (default) generates `opencode.jsonc`;
-     `generic` generates `README-HARNESS.md` instead for non-opencode harnesses.
-   - `--skip-init` — copy the engine, personas, templates, and knowledge defaults only;
-     skip coupler initialization and self-check.
-
-#### What the installer does
-
-1. **Copies the engine**: `bin/` scripts land in
-   `.agents/skills/icm-okf-gates/scripts/` (as `icm_okf_coupler.py` and
-   `system-start.py`) and `system-start.py` is also copied to the workspace root as the
-   boot entry point.
-2. **Copies persona templates** to `.profiles/` (`orchestrator.md`,
-   `investigator.md`, `programmer.md`).
-3. **Copies OKF templates and the harness README** into the skill's
-   `resources/templates/` directory.
-4. **Copies default OKF knowledge entities** — invariants, relations, and schemas —
-   into `knowledge/`.
-5. **Copies skill payloads** — the `grilling` and `vocabulary` skills (with the
-   conformance checker, fixtures, and gate-policy bundle) land in `.agents/skills/`.
-6. **Runs the coupler in `init` mode**: detects the target's state, generates
-   `AGENTS.md`, `manifest.yaml`, `opencode.jsonc`, writes `knowledge/index.md`, and
-   creates the `active-tasks/shared-software/` sandbox directory.
-7. **Runs the coupler in `self-check` mode**: verifies every required file exists and
-   is valid, and returns **exit code 0** only on success.
-
-#### Post-install configuration
-
-The installer writes placeholder model names so that no interactive probing is
-required:
-
-1. Edit `manifest.yaml` — set `project_name` and replace each `<your-<persona>-model>`
-   with the real model identifiers you will route to.
-2. Edit `opencode.jsonc` — set the provider `baseURL` and `apiKey` for your serving
-   endpoint, and replace the model placeholders (including the top-level `"model"`
-   default).
-3. Start opencode in the workspace root (it reads `AGENTS.md`, `opencode.jsonc`, and
-   `manifest.yaml` at startup), or wire `.profiles/*.md` into any other harness
-   (see the bundled `README-HARNESS.template.md`).
-4. Boot the system: `uv run system-start.py`.
-5. Create your first task: `active-tasks/<task-name>/query.md`.
-
-#### Troubleshooting
-
-- **`pyyaml` availability** — the coupler prefers
-  `uv run --with pyyaml python ...`, which auto-provisions `pyyaml` with no virtual
-  environment work. With plain `python` (no `uv`, no `pyyaml`), the coupler uses its
-  built-in minimal YAML writer, so installs still succeed — the generated YAML is
-  slightly simpler but fully parseable.
-- **"Target directory does not exist"** — the installer never creates the target
-  itself; create it first with `mkdir`.
-- **Non-zero exit code** — the installer stops and prints the failing step. If it was
-  the self-check, read the reported missing/invalid files and re-run; the installer is
-  non-destructive (it never overwrites existing files).
-
-### Section B — Method 2: skill command (`fram-bootstrap/`)
-
-The bootstrap skill performs the same scaffolding as the Python installer using
-only file-tool operations (read / write / copy) inside an agent harness. No Python
-runtime, no `setup.py`, no package installation.
-
-#### Prerequisites
-
-- Any agent harness with file **read / write / copy** tools — opencode, Claude Code,
-  Codex, etc.
-- A target directory (usually your project root).
-- Read permission on the skill's bundled `resources/` tree.
-
-#### Install the skill
-
-**Global install (opencode)** — copy the entire `fram-bootstrap/` folder (this
-`SKILL.md` + `resources/`) into the opencode skills directory:
-
-- Windows: `C:\Users\<you>\.config\opencode\skills\fram-bootstrap\`
-- macOS / Linux: `~/.config/opencode/skills/fram-bootstrap/`
-
-Restart opencode (or reload skills), then invoke with `/fram-bootstrap`.
-
-**Per-project (any harness)** — copy the entire `fram-bootstrap/` folder into
-`<project>/.agents/skills/fram-bootstrap/`. For opencode, ensure `skills.paths`
-includes `./.agents/skills` in your project `opencode.jsonc` (the FRAM scaffold
-template ships with this already). For other harnesses, copy the folder to wherever
-that harness loads skills/prompts from.
-
-#### Invoke
-
-Type `/fram-bootstrap` in a chat session, optionally naming the target directory.
-The agent then:
-
-1. **Detects target state** (non-destructive): empty → full scaffold; partial → merge,
-   never overwriting existing files (conflicts are recorded and reported); complete →
-   stop with "already bootstrapped".
-2. **Creates the folder structure** — `.profiles/`, `knowledge/` subfolders,
-   `active-tasks/shared-software/`, and the `icm-okf-gates`, `grilling`, and
-   `vocabulary` skill trees.
-3. **Copies the bundled payload** — engine scripts, persona templates, OKF knowledge
-   templates/defaults, skill payloads, and the config skeletons (`AGENTS.md`,
-   `manifest.yaml`, `opencode.jsonc`) using exact source→destination mappings (see
-   `SKILL.md` §3).
-4. **Writes generated files** — `knowledge/index.md` and the minimal
-   `.agents/skills/icm-okf-gates/SKILL.md` marker.
-5. **Verifies deterministically** — a file inventory checklist (every required file
-   present), plus config sanity: `manifest.yaml` has a `personas:` section with a
-   `prompt_path` per persona, and `opencode.jsonc` parses as strict JSON.
-6. **Reports** — installed file count, conflict list (if any), and verification result.
-
-The scaffold is complete the moment the skill finishes. The bundled engine scripts
-(`.agents/skills/icm-okf-gates/scripts/`) are optional **post-install tooling**: once
-Python is available you can run the coupler's `self-check` or `uv run system-start.py`
-from the workspace, but the workspace itself never requires them.
-
-#### Post-install configuration
-
-1. Edit `<target>/manifest.yaml` — replace `<your-project-name>` and each
-   `<your-<persona>-model>` placeholder with real model names.
-2. Edit `<target>/opencode.jsonc` — replace the provider `baseURL`, the model
-   placeholders, and the top-level `"model"` default with your actual model ids.
-3. Create your first task: `active-tasks/<task-name>/query.md`.
-
-### Section C — Which method should you use?
-
-| Dimension | Method 1 — `fram-python/` | Method 2 — `fram-bootstrap/` |
-|:---|:---|:---|
-| **Runtime** | Python 3.8+ (stdlib only; `uv` optional) | None — agent file tools only |
-| **Prerequisites** | Python; existing target directory | Agent harness with read/write/copy tools |
-| **Interactivity** | `--non-interactive` for unattended; interactive persona interview otherwise | Agent-guided: state detection, non-destructive merge, conflict report |
-| **Verification** | Coulper `self-check`, exit code 0 | Deterministic file inventory + config parse checklist |
-| **Repeatability** | Fully scriptable / CI-able | Guided but agent-mediated |
-| **Scaffold produced** | Identical file inventory | Identical file inventory |
-| **When to use** | You have Python and want a scripted, repeatable, unattended install | You have no Python runtime, or you want a guided install driven by your agent |
-
-**In short:** running `python setup.py --target <dir> --non-interactive` and invoking
-`/fram-bootstrap` produce the same FRAM workspace. Use the Python method when you
-want a deterministic command you can re-run and log; use the skill method when you are
-already inside an agent and do not want to leave it — or when Python is unavailable.
+For the method comparison table, troubleshooting, bundled-skills table, and the
+non-destructive overwrite behavior, see [INSTALL.md](INSTALL.md).
 
 ---
 
@@ -309,16 +159,19 @@ already inside an agent and do not want to leave it — or when Python is unavai
 ```
 File-Routed-Agentic-Mesh/
 ├── README.md                     This file
+├── INSTALL.md                    Install instructions for both methods
 ├── LICENSE                       MIT license
 ├── .gitignore                    Standard ignores
 ├── fram-python/                  Method 1: Python installer (no dependencies)
 │   ├── setup.py                  Raw-Python installer entry point
 │   ├── bin/                      FRAM engine (icm_okf_coupler_v2.py, system-start-v2.py)
-│   ├── templates/                Persona prompts, OKF templates, skills, README-HARNESS template
-│   └── defaults/                 Default OKF knowledge entities
+│   ├── templates/                Persona prompts, OKF templates, README-HARNESS template
+│   │   └── skills/               Bundled skills: grilling/, vocabulary/ (SKILL.md, scripts/, fixtures/, resources/)
+│   └── defaults/                 Default OKF knowledge entities (incl. workspace-vocabulary, ste-consistency)
 └── fram-bootstrap/               Method 2: skill command (no Python)
     ├── SKILL.md                  Skill instructions + scaffold procedure
     └── resources/                Bundled payload (scripts, templates, defaults)
+        └── templates/skills/     Byte-identical mirror of fram-python/templates/skills/
 ```
 
 ## License

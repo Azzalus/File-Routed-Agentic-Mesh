@@ -55,7 +55,6 @@ personas:
         "*active-tasks*-output*": "allow"
         "*active-tasks*BLACKBOARD.md": "allow"
         "*active-tasks*mcp-scratchpad*": "allow"
-        "*.agents*skills*": "allow"
         "knowledge/*": "allow"
         "*active-tasks*/knowledge/*": "allow"
         "*opencode.jsonc": "ask"
@@ -103,6 +102,8 @@ environment_policies:
     - "active-tasks/*/*-source/"
     - "active-tasks/*/*-output/"
     - ".profiles/"
+    - "knowledge/"
+    - "active-tasks/*/knowledge/"
   allowed_write_paths:
     - "active-tasks/*/BLACKBOARD.md"
     - "active-tasks/*/*-source/"

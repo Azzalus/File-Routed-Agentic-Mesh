@@ -4,7 +4,7 @@
   "type": "invariant",
   "properties": {
     "name": "STE Consistency",
-    "description": "User-facing output uses one canonical term per concept, one sentence per meaning, active voice, and never an _Avoid_ synonym. STE wording rules apply only to outputs forwarded directly to the user (D5).",
+    "description": "User-facing output uses one canonical term per concept, one sentence per meaning, active voice, and never an _Avoid_ synonym. STE wording rules apply only to outputs forwarded directly to the user.",
     "enforced_by": ["orchestrator"],
     "violation_action": "block user-facing output, route through the vocabulary conformance checker"
   },

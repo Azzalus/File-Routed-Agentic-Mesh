@@ -82,7 +82,6 @@ DEFAULT_PERSONAS = {
                 "*active-tasks*-output*": "allow",
                 "*active-tasks*BLACKBOARD.md": "allow",
                 "*active-tasks*mcp-scratchpad*": "allow",
-                "*.agents*skills*": "allow",
                 "knowledge/*": "allow",
                 "*active-tasks*/knowledge/*": "allow",
                 "*opencode.jsonc": "ask",
@@ -143,19 +142,6 @@ DEFAULT_KNOWLEDGE_INVARIANTS = {
         "relations": [{"source": "inv-blackboard", "target": "schema-fram-layout", "type": "GOVERNS"}],
         "invariants": [],
     },
-    "ste-consistency.json": {
-        "$schema": "https://schema.okf.org/v1/knowledge.json",
-        "metadata": {"id": "inv-ste", "domain": "fram", "version": "1.0"},
-        "type": "invariant",
-        "properties": {
-            "name": "STE Consistency",
-            "description": "User-facing output uses one canonical term per concept, one sentence per meaning, active voice, and never an _Avoid_ synonym. STE wording rules apply only to outputs forwarded directly to the user (D5).",
-            "enforced_by": ["orchestrator"],
-            "violation_action": "block user-facing output, route through the vocabulary conformance checker",
-        },
-        "relations": [{"source": "inv-ste", "target": "schema-workspace-vocabulary", "type": "CONSTRAINS"}],
-        "invariants": [],
-    },
 }
 
 DEFAULT_KNOWLEDGE_RELATIONS = {
@@ -211,20 +197,6 @@ DEFAULT_KNOWLEDGE_SCHEMAS = {
         },
         "relations": [],
         "invariants": ["inv-det-gate"],
-    },
-    "workspace-vocabulary.json": {
-        "$schema": "https://schema.okf.org/v1/knowledge.json",
-        "metadata": {"id": "schema-workspace-vocabulary", "domain": "fram", "version": "1.0"},
-        "type": "schema",
-        "properties": {
-            "name": "Workspace Vocabulary",
-            "description": "Controlled vocabulary catalog: one canonical term per concept, rejected synonyms listed, task terms shadow workspace terms (OD4).",
-            "fields": [
-                {"name": "terms", "role": "List of canonical terms: {canonical, definition, avoid[], source_task}"},
-            ],
-        },
-        "relations": [],
-        "invariants": ["inv-ste"],
     },
 }
 
@@ -538,9 +510,6 @@ def scaffold_opencode_jsonc(root: Path, config: Dict) -> None:
                 "*": "allow",
                 "git push*": "deny",
                 "git reset --hard*": "deny",
-                "git clean*": "deny",
-                "rmdir /s /q*": "ask",
-                "del /f /s /q*": "ask",
             }
         },
         "agent": agent_defs,
@@ -602,6 +571,8 @@ def scaffold_manifest(root: Path, config: Dict) -> None:
                 "active-tasks/*/*-source/",
                 "active-tasks/*/*-output/",
                 ".profiles/",
+                "knowledge/",
+                "active-tasks/*/knowledge/",
             ],
             "allowed_write_paths": [
                 "active-tasks/*/BLACKBOARD.md",
@@ -766,7 +737,7 @@ def scaffold_agents_md(root: Path) -> None:
         "3. **Deterministic Gate**: Every stage must pass a deterministic check (exit code 0).\n"
         "4. **Allowed Scope**: Source in `<task>-source/`, builds in `<task>-output/`.\n"
         "5. **Knowledge Access**: Query `knowledge/index.md` for domain schemas and invariants.\n"
-        "6. **Layer 0/1 Conditional-Edit Rule**: Layer 0/1 files (`AGENTS.md`, `manifest.yaml`, `opencode.jsonc`) may be edited by an agent only when (a) the user has defined the new entries beforehand and (b) the user has explicitly authorized the edit. The runtime `edit` patterns for those files are gated `\"ask\"` in `opencode.jsonc`, so no such edit can happen silently.\n",
+        "6. **Layer 0/1 Conditional-Edit Rule**: Layer 0/1 files (`AGENTS.md`, `manifest.yaml`, `opencode.jsonc`) are editable by an agent only when (a) the user has defined the new entries beforehand and (b) the user has explicitly authorized the edit; the agent must confirm the authorization before editing. The runtime `edit` patterns for those files are gated `\"ask\"` in `opencode.jsonc`, so no such edit can happen silently.\n",
         encoding="utf-8",
     )
 
@@ -869,7 +840,7 @@ def audit_workspace(root: Path) -> int:
         knowledge_entities = [str(p.relative_to(root)) for p in knowledge_dir.rglob("*.json")]
         if not (knowledge_dir / "index.md").exists():
             issues.append("knowledge/index.md missing")
-        for inv_file in ["sandbox-rule.json", "deterministic-gate.json", "blackboard-protocol.json", "ste-consistency.json"]:
+        for inv_file in ["sandbox-rule.json", "deterministic-gate.json", "blackboard-protocol.json"]:
             inv_path = knowledge_dir / "invariants" / inv_file
             if not inv_path.exists():
                 issues.append(f"Missing default invariant: {inv_file}")
@@ -958,7 +929,7 @@ def run_self_check(root: Path) -> int:
     else:
         if not (knowledge_dir / "index.md").exists():
             errors.append("knowledge/index.md missing")
-        for inv in ["sandbox-rule.json", "deterministic-gate.json", "blackboard-protocol.json", "ste-consistency.json"]:
+        for inv in ["sandbox-rule.json", "deterministic-gate.json", "blackboard-protocol.json"]:
             p = knowledge_dir / "invariants" / inv
             if not p.exists():
                 errors.append(f"Missing invariant: {inv}")
@@ -970,7 +941,7 @@ def run_self_check(root: Path) -> int:
                     errors.append(f"Invalid JSON: {inv}")
         if not (knowledge_dir / "relations" / "persona-flow.json").exists():
             errors.append("Missing relation: persona-flow.json")
-        for schema in ["fram-layout.json", "task-lifecycle.json", "workspace-vocabulary.json"]:
+        for schema in ["fram-layout.json", "task-lifecycle.json"]:
             p = knowledge_dir / "schemas" / schema
             if not p.exists():
                 errors.append(f"Missing schema: {schema}")

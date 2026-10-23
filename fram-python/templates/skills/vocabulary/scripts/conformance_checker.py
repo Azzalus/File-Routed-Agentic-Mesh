@@ -10,7 +10,7 @@ Modes:
     --self-test                     run internal unit checks (contract sanity)
     --mutation-test <fixtures-dir>  run the six AC4 negative fixtures
     --lint --artifact <path>        lint one user-facing artifact (AC4 a-c)
-    --preexisting --artifact <path> lint in pre-existing mode (never fails; R33)
+    --preexisting --artifact <path> lint in pre-existing mode (never fails; baseline report only)
 
 Options:
     --vocabulary <json>   vocabulary catalog (default: workspace entity)
@@ -364,7 +364,7 @@ def run_lint(args) -> int:
 
 
 def run_preexisting(args) -> int:
-    """R33: report pre-existing content but never fail the gate."""
+    """Report pre-existing content but never fail the gate."""
     artifact = Path(args.artifact)
     vocabulary = load_json(Path(args.vocabulary)) if args.vocabulary else {"terms": []}
     text = artifact.read_text(encoding="utf-8", errors="ignore")

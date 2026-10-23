@@ -73,7 +73,6 @@
           "type *": "allow",
           "findstr *": "allow",
           "uv run *icm_okf_coupler.py*": "allow",
-          "uv run *validate_gate.py*": "allow",
           "uv run *compile_agent_context.py*": "allow"
         }
       }
@@ -123,13 +122,13 @@
           "*active-tasks*-output*": "allow",
           "*active-tasks*mcp-scratchpad*": "allow",
           "*active-tasks*BLACKBOARD.md": "allow",
-          "*.agents*skills*": "allow",
           "knowledge/*": "allow",
           "*active-tasks*/knowledge/*": "allow",
           "*opencode.jsonc": "ask",
           "*opencode.json": "ask",
           "*manifest.yaml": "ask",
-          "*AGENTS.md": "ask"
+          "*AGENTS.md": "ask",
+          "*.agents*skills*": "allow"
         },
         "bash": {
           "*": "ask",

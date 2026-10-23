@@ -3,7 +3,8 @@ name: fram-bootstrap
 description: >-
   File-Routed Agentic Mesh (FRAM) v2 workspace installer with NO Python dependency.
   Use to scaffold a complete FRAM v2 workspace (AGENTS.md, manifest.yaml, opencode.jsonc,
-  .profiles/, knowledge/, system-start.py, and the bundled icm-okf-gates skill) in any
+  .profiles/, knowledge/, system-start.py, and the bundled icm-okf-gates, grilling, and
+  vocabulary skills) in any
   target directory using only file read/write/copy tools. Works in opencode, Claude Code,
   Codex, or any agent harness that can read and write files. Complementary to the Python
   setup.py installer: use this skill when Python is unavailable or for a guided,
@@ -80,6 +81,14 @@ new file creation).
 | `templates/knowledge/relation.template.json` | `<target>/.agents/skills/icm-okf-gates/resources/templates/knowledge/relation.template.json` |
 | `templates/knowledge/constraint.template.json` | `<target>/.agents/skills/icm-okf-gates/resources/templates/knowledge/constraint.template.json` |
 | `templates/README-HARNESS.template.md` | `<target>/.agents/skills/icm-okf-gates/resources/templates/README-HARNESS.template.md` |
+| `templates/skills/grilling/SKILL.md` | `<target>/.agents/skills/grilling/SKILL.md` |
+| `templates/skills/vocabulary/SKILL.md` | `<target>/.agents/skills/vocabulary/SKILL.md` |
+| `templates/skills/vocabulary/scripts/conformance_checker.py` | `<target>/.agents/skills/vocabulary/scripts/conformance_checker.py` |
+| `templates/skills/vocabulary/fixtures/artifact-good.md` | `<target>/.agents/skills/vocabulary/fixtures/artifact-good.md` |
+| `templates/skills/vocabulary/fixtures/grilling-log-good.json` | `<target>/.agents/skills/vocabulary/fixtures/grilling-log-good.json` |
+| `templates/skills/vocabulary/fixtures/mutations.json` | `<target>/.agents/skills/vocabulary/fixtures/mutations.json` |
+| `templates/skills/vocabulary/fixtures/vocabulary.json` | `<target>/.agents/skills/vocabulary/fixtures/vocabulary.json` |
+| `templates/skills/vocabulary/resources/vocabulary-task.template.json` | `<target>/.agents/skills/vocabulary/resources/vocabulary-task.template.json` |
 | `templates/AGENTS.md` | `<target>/AGENTS.md` |
 | `templates/manifest.yaml` | `<target>/manifest.yaml` |
 | `templates/opencode.jsonc` | `<target>/opencode.jsonc` |
@@ -91,15 +100,6 @@ new file creation).
 | `defaults/knowledge/schemas/task-lifecycle.json` | `<target>/knowledge/schemas/task-lifecycle.json` |
 | `defaults/knowledge/schemas/workspace-vocabulary.json` | `<target>/knowledge/schemas/workspace-vocabulary.json` |
 | `defaults/knowledge/invariants/ste-consistency.json` | `<target>/knowledge/invariants/ste-consistency.json` |
-| `templates/skills/grilling/SKILL.md` | `<target>/.agents/skills/grilling/SKILL.md` |
-| `templates/skills/vocabulary/SKILL.md` | `<target>/.agents/skills/vocabulary/SKILL.md` |
-| `templates/skills/vocabulary/scripts/conformance_checker.py` | `<target>/.agents/skills/vocabulary/scripts/conformance_checker.py` |
-| `templates/skills/vocabulary/scripts/grilling_suite_gate_policy.json` | `<target>/.agents/skills/vocabulary/scripts/grilling_suite_gate_policy.json` |
-| `templates/skills/vocabulary/resources/vocabulary-task.template.json` | `<target>/.agents/skills/vocabulary/resources/vocabulary-task.template.json` |
-| `templates/skills/vocabulary/fixtures/vocabulary.json` | `<target>/.agents/skills/vocabulary/fixtures/vocabulary.json` |
-| `templates/skills/vocabulary/fixtures/artifact-good.md` | `<target>/.agents/skills/vocabulary/fixtures/artifact-good.md` |
-| `templates/skills/vocabulary/fixtures/grilling-log-good.json` | `<target>/.agents/skills/vocabulary/fixtures/grilling-log-good.json` |
-| `templates/skills/vocabulary/fixtures/mutations.json` | `<target>/.agents/skills/vocabulary/fixtures/mutations.json` |
 
 ### Step C — Write generated files (new content, from the constants below)
 
@@ -214,9 +214,8 @@ All of the following must exist under `<target>`:
 - `.agents/skills/grilling/SKILL.md`
 - `.agents/skills/vocabulary/SKILL.md`
 - `.agents/skills/vocabulary/scripts/conformance_checker.py`
-- `.agents/skills/vocabulary/scripts/grilling_suite_gate_policy.json`
+- `.agents/skills/vocabulary/fixtures/` (artifact-good.md, grilling-log-good.json, mutations.json, vocabulary.json)
 - `.agents/skills/vocabulary/resources/vocabulary-task.template.json`
-- `.agents/skills/vocabulary/fixtures/` (4 fixture files)
 - `active-tasks/shared-software/` (directory)
 
 ### Config sanity

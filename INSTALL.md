@@ -1,138 +1,216 @@
-# INSTALL — File-Routed Agentic Mesh (FRAM)
+# INSTALL.md — File-Routed Agentic Mesh (FRAM)
 
-This repo ships two independent installers that produce the **same** FRAM workspace
-scaffold. Pick one. For the full rationale, see [`README.md`](README.md).
+Two independent install methods produce the same FRAM workspace scaffold.
+Run every shell block below from the **repository root** (the directory that
+contains `fram-python/` and `fram-bootstrap/`). Blocks within a section run
+sequentially in the same shell session.
 
-| Method | Folder | Needs |
+| Method | Folder | What you need |
 |:---|:---|:---|
-| 1 — Python installer | [`fram-python/`](fram-python/) | Python 3.8+ (stdlib only) |
-| 2 — skill command | [`fram-bootstrap/`](fram-bootstrap/) | An agent harness with file read/write/copy tools (no Python) |
-
-Both install into an **existing** target directory. Create the target first.
+| **Method 1 — Python installer** | [`fram-python/`](fram-python/) | Python 3.8+ (standard library only); `uv` optional |
+| **Method 2 — skill command** | [`fram-bootstrap/`](fram-bootstrap/) | Any agent harness with file read/write/copy tools — no Python at all |
 
 ---
 
-## Method 1 — Python installer
+## Method 1 — Python installer (`fram-python/`)
+
+### Prerequisites
+
+- **Python 3.8+** — standard library only. No `pip install`, no `requirements.txt`,
+  no virtual environment.
+- **(Optional) `uv`** — if `uv` is on your `PATH`, the installer runs the coupler
+  with `pyyaml` auto-provisioned. Without `uv`, plain Python is used and the coupler
+  falls back to a built-in minimal YAML writer. Either way, no manual dependency
+  setup.
+
+### Install
+
+1. Create the target directory — the installer installs *into* an existing directory
+   and exits with an error if the target does not exist.
+2. Run the installer:
 
 ```bash
-mkdir ~/my-workspace
-cd fram-python
-python setup.py --target ~/my-workspace --non-interactive
+mkdir fram-workspace
+python fram-python\setup.py --target fram-workspace --non-interactive
 ```
 
 Flags:
 
-- `--target <path>` — install destination (default: current directory). Must exist.
-- `--non-interactive` — skip the persona interview; write the default skeleton.
-- `--harness {opencode,generic}` — `opencode` (default) writes `opencode.jsonc`;
-  `generic` writes `README-HARNESS.md` instead.
-- `--skip-init` — copy files only; skip coupler `init` and `self-check`.
+- `--target <path>` — where to install (default: current directory). The directory
+  must already exist.
+- `--non-interactive` — skip the persona interview; write the default persona/model
+  skeleton.
+- `--harness {opencode,generic}` — `opencode` (default) generates `opencode.jsonc`;
+  `generic` generates `README-HARNESS.md` for non-opencode harnesses.
+- `--skip-init` — copy files only; skip coupler initialization and self-check.
 
-The installer finishes by running the coupler in `self-check` mode. Exit code **0**
-means success.
+Interactive alternative (prompts for personas and models):
+`python fram-python\setup.py --target fram-workspace`
 
-## Method 2 — skill command
+What the installer does:
 
-1. Install the skill:
-   - Global (opencode): copy `fram-bootstrap/` to
-     `~/.config/opencode/skills/fram-bootstrap/` (Windows:
-     `C:\Users\<you>\.config\opencode\skills\fram-bootstrap\`).
-   - Per-project: copy `fram-bootstrap/` to `<project>/.agents/skills/fram-bootstrap/`.
-2. Invoke `/fram-bootstrap` in a chat session and name the target directory.
-3. The skill scaffolds the workspace, then runs a deterministic file-inventory and
-   config-parse check.
+1. Copies the engine scripts into `.agents/skills/icm-okf-gates/scripts/`
+   (installed as `icm_okf_coupler.py` and `system-start.py`) and copies
+   `system-start.py` to the workspace root as the boot entry point.
+2. Copies persona templates to `.profiles/` (orchestrator, investigator, programmer).
+3. Copies OKF knowledge templates and the harness README into the skill's
+   `resources/templates/` directory.
+4. Copies the bundled skills from `templates/skills/` recursively into
+   `.agents/skills/` (`icm-okf-gates`, `grilling`, `vocabulary`).
+5. Copies default OKF knowledge entities (invariants, relations, schemas —
+   including `workspace-vocabulary.json` and `ste-consistency.json`) into `knowledge/`.
+6. Runs the coupler in `init` mode: generates `AGENTS.md`, `manifest.yaml`,
+   `opencode.jsonc` (Layer 0/1 files gated `"ask"`), writes `knowledge/index.md`,
+   registers the bundled skills in `manifest.yaml`, and creates the
+   `active-tasks/shared-software/` sandbox directory.
+7. Runs the coupler in `self-check` mode: verifies required files exist and are
+   valid, and returns **exit code 0** only on success.
+
+### Verify and boot
+
+Run from the repository root, immediately after the install block:
+
+```bash
+cd fram-workspace
+python .agents\skills\icm-okf-gates\scripts\icm_okf_coupler.py --mode self-check
+uv run --with pyyaml python system-start.py
+cd ..
+```
+
+- The coupler accepts only `--mode`, `--harness`, `--non-interactive`, and
+  `--domain`. There is no `--target` flag: the coupler always operates on the
+  current working directory, so run it with `cwd` = the workspace root.
+- Boot with `uv run --with pyyaml python system-start.py` from the workspace root.
+  A bare `python system-start.py` fails if `pyyaml` is not installed in the current
+  interpreter.
+
+### First-use smoke task
+
+```bash
+cd fram-workspace
+if not exist active-tasks\smoke-task mkdir active-tasks\smoke-task
+echo Replace this line with your task goal. > active-tasks\smoke-task\query.md
+cd ..
+```
+
+Open `active-tasks\smoke-task\query.md` and replace the placeholder line with a
+real goal, then start your harness in the workspace root.
 
 ---
 
-## After install (both methods)
+## Method 2 — skill command (`fram-bootstrap/`)
 
-1. Edit `manifest.yaml` — set `project_name` and replace every
-   `<your-<persona>-model>` placeholder.
-2. Edit `opencode.jsonc` — set the provider `baseURL`, `apiKey`, and model ids.
-3. Start opencode in the workspace root, or wire `.profiles/*.md` into another
-   harness.
-4. Boot: `uv run system-start.py`.
+### Prerequisites
+
+- Any agent harness with file **read / write / copy** tools — opencode, Claude Code,
+  Codex, etc.
+- A target directory (usually your project root).
+
+### Install the skill
+
+**Global install (opencode)** — copy the entire `fram-bootstrap/` folder
+(`SKILL.md` + `resources/`) into the opencode skills directory:
+
+- Windows: `C:\Users\<you>\.config\opencode\skills\fram-bootstrap\`
+- macOS / Linux: `~/.config/opencode/skills/fram-bootstrap/`
+
+Restart opencode (or reload skills), then invoke with `/fram-bootstrap`.
+
+**Per-project (any harness)** — copy the entire `fram-bootstrap/` folder into
+`<project>/.agents/skills/fram-bootstrap/`. For opencode, ensure `skills.paths`
+includes `./.agents/skills` in your project `opencode.jsonc` (the FRAM scaffold
+template ships with this already).
+
+### Scaffold
+
+Type `/fram-bootstrap` in a chat session and name the target directory
+(for example `fram-workspace`). The agent follows the skill's Step A/B/C tables
+with file tools only: it creates the folder structure, copies the engine scripts,
+persona templates, config skeletons (`AGENTS.md`, `manifest.yaml`, `opencode.jsonc`),
+OKF defaults (including `workspace-vocabulary.json` and `ste-consistency.json`),
+the `grilling` and `vocabulary` skills, and writes `knowledge/index.md`. No shell
+commands are required for the scaffold itself.
+
+### Verify and boot
+
+Run these from the repository root once the skill reports the scaffold complete:
+
+```bash
+cd fram-workspace
+python .agents\skills\icm-okf-gates\scripts\icm_okf_coupler.py --mode self-check
+uv run --with pyyaml python system-start.py
+cd ..
+```
+
+The coupler accepts only `--mode`, `--harness`, `--non-interactive`, and `--domain`
+(no `--target` flag — it operates on the current working directory). The verification
+commands above are optional post-install tooling: the scaffold itself never needs
+Python.
+
+### First-use smoke task
+
+```bash
+cd fram-workspace
+if not exist active-tasks\smoke-task mkdir active-tasks\smoke-task
+echo Replace this line with your task goal. > active-tasks\smoke-task\query.md
+cd ..
+```
+
+---
+
+## Post-install configuration (both methods)
+
+1. Edit `manifest.yaml` — replace `<your-project-name>` and each
+   `<your-<persona>-model>` placeholder with the real model identifiers you route to.
+2. Edit `opencode.jsonc` — replace the provider `baseURL` and `apiKey` for your
+   serving endpoint, and replace the model placeholders (including the top-level
+   `"model"` default).
+3. Start opencode in the workspace root (it reads `AGENTS.md`, `opencode.jsonc`, and
+   `manifest.yaml` at startup), or wire `.profiles/*.md` into any other harness
+   (see the bundled `README-HARNESS.template.md`).
+4. Boot: `uv run --with pyyaml python system-start.py` from the workspace root.
 5. Create your first task: `active-tasks/<task-name>/query.md`.
+
+Layer 0/1 files (`AGENTS.md`, `manifest.yaml`, `opencode.jsonc`) are editable only
+when you have defined the new entries beforehand and have explicitly authorized the
+edit — the runtime `"ask"` permission patterns in `opencode.jsonc` enforce this.
+
+---
 
 ## Bundled skills
 
-Both installers place three skills under `.agents/skills/`:
+Every installed workspace contains these skills under `.agents/skills/`:
 
-| Skill | Purpose |
-|:---|:---|
-| `icm-okf-gates` | ICM/OKF coupling engine (init, audit, self-check). |
-| `grilling` | Structured requirement Q&A with a bounded round log. |
-| `vocabulary` | Controlled vocabulary capture, STE consistency, conformance checker. |
+| Skill | Location | Purpose |
+|:---|:---|:---|
+| `icm-okf-gates` | `.agents/skills/icm-okf-gates/` | Workspace initialization, ICM/OKF coupling, deterministic gates (coupler: `init`, `audit`, `self-check`; boot script). |
+| `grilling` | `.agents/skills/grilling/` | Relentless design interview for Stage 01: asks the whole frontier in one question round, halts when ambiguity survives two rounds, mandates the grilling log. |
+| `vocabulary` | `.agents/skills/vocabulary/` | Controlled term capture: SKILL body, conformance checker (`scripts/conformance_checker.py`), fixtures, and the per-task vocabulary template. |
 
-The `vocabulary` skill ships a deterministic checker:
+`knowledge/index.md` lists the workspace catalog entities, including
+`schemas/workspace-vocabulary.json` and `invariants/ste-consistency.json`.
 
-```bash
-uv run .agents/skills/vocabulary/scripts/conformance_checker.py --self-test
-uv run .agents/skills/vocabulary/scripts/conformance_checker.py --mutation-test .agents/skills/vocabulary/fixtures
-```
+---
 
-Exit code **0** means the check passed.
+## Verification commands (summary)
 
-## Verification commands
+All commands run with `cwd` = the installed workspace root:
 
-Run these after install to confirm the workspace is coherent:
+- File presence: `.agents/skills/icm-okf-gates/SKILL.md`,
+  `.agents/skills/grilling/SKILL.md`, `.agents/skills/vocabulary/SKILL.md`,
+  `knowledge/schemas/workspace-vocabulary.json`,
+  `knowledge/invariants/ste-consistency.json` must all exist.
+- Coupler self-check: `python .agents\skills\icm-okf-gates\scripts\icm_okf_coupler.py --mode self-check`
+  → exit code 0.
+- Boot: `uv run --with pyyaml python system-start.py` → exit code 0.
+- Conformance checker (optional, from the workspace root):
+  `python .agents\skills\vocabulary\scripts\conformance_checker.py --self-test`
+  → exit code 0.
 
-```bash
-# Coupler self-check (setup.py path installs land at .agents/skills/icm-okf-gates/scripts/)
-uv run .agents/skills/icm-okf-gates/scripts/icm_okf_coupler.py --mode self-check --target .
-uv run .agents/skills/icm-okf-gates/scripts/icm_okf_coupler.py --mode audit --target .
+---
 
-# Boot the system and confirm both persona lines print
-uv run system-start.py
+## Notes
 
-# Checker contract tests
-uv run .agents/skills/vocabulary/scripts/conformance_checker.py --self-test
-```
-
-## First-use smoke task (R22)
-
-Create a throwaway task to exercise the grilling and vocabulary skills end to end:
-
-1. Create `active-tasks/smoke-test/query.md` with one line.
-2. Run the grilling skill; let it write
-   `active-tasks/smoke-test/mcp-scratchpad/grilling-log.json`.
-3. Run the checker against that real log:
-   ```bash
-   uv run .agents/skills/vocabulary/scripts/conformance_checker.py \
-     --lint --log active-tasks/smoke-test/mcp-scratchpad/grilling-log.json \
-     --mandate .agents/skills/grilling/SKILL.md
-   ```
-4. Delete the throwaway task. A genuine grilling log cannot exist until the suite is
-   used, so this smoke task is the first real-log verification.
-
-## Migrating an existing workspace (OD7-authorized merge)
-
-Both installers are **non-destructive**: they never overwrite an existing file. A
-workspace that was bootstrapped before this release keeps its old `AGENTS.md`,
-`manifest.yaml`, and `opencode.jsonc`, so the framework-level policy fix never
-arrives. To migrate an existing workspace, merge the new policy by hand:
-
-1. **Overwrite asymmetry** — re-running either installer into an existing target
-   skips files that already exist. No config file is ever replaced. This is why the
-   merge is manual.
-2. **Merge the OD7 conditional-edit rule into `AGENTS.md`** — add the Layer 0/1
-   conditional-edit rule.
-3. **Merge the `"ask"` gating into `opencode.jsonc`** — add the Layer 0/1 `edit`
-   patterns (`*opencode.jsonc`, `*opencode.json`, `*manifest.yaml`, `*AGENTS.md`)
-   with value `"ask"`, and add the anchored `knowledge/*` and
-   `*active-tasks*/knowledge/*` allows.
-4. **Merge the write paths into `manifest.yaml`** — add `knowledge/` and
-   `active-tasks/*/knowledge/` to `allowed_write_paths`, and register the `grilling`
-   and `vocabulary` skills in the `skills:` catalog.
-5. **OD7-authorized:** edit Layer 0/1 files only when the user has defined the new
-   entries beforehand and has explicitly authorized the edit.
-
-## D-L7 policy-bundle dependency (R34)
-
-`vocabulary/scripts/grilling_suite_gate_policy.json` is a self-contained policy
-bundle in the `{"data": ..., "policy": ...}` envelope that `validate_gate.py`
-unwraps. **The repo and both installers do not ship `validate_gate.py`** — the
-round-trip install will not contain it. Consuming the D-L7 bundle therefore requires a
-workspace whose `.agents/skills/icm-okf-gates/scripts/` includes `validate_gate.py`.
-A repo-only install ships the bundle without a runner; this is expected.
-
+- **Non-destructive:** neither installer overwrites an existing file. Re-running an
+  install (or the bootstrap skill's partial-merge path) skips files that are already
+  present and reports them as conflicts; your edits are never clobbered.
