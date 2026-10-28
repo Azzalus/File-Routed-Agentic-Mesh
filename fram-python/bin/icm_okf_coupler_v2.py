@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ICM-OKF Coupling & Initialization Engine (FRAM v2).
+ICM-OKF Coupling & Initialization Engine for FRAM v2.
 
 Detects FRAM workspace state, scaffolds missing structures, provisions personas
 and OKF knowledge catalogs. Supports interactive persona interview, multiple
@@ -35,7 +35,7 @@ except ImportError:
 
 DEFAULT_PERSONAS = {
     "orchestrator": {
-        "role": "Orchestration, planning, routing, final compilation",
+        "role": "FRAM Orchestrator. Reads active-tasks/*/query.md, drafts plans, routes through the Investigator red-team gate, dispatches to the Programmer, and compiles the final answer. Never writes source code.",
         "temperature": 0.2,
         "prompt_path": ".profiles/orchestrator.md",
         "permissions": {
@@ -53,7 +53,7 @@ DEFAULT_PERSONAS = {
         },
     },
     "investigator": {
-        "role": "Plan red-team review, analysis, risk assessment",
+        "role": "FRAM Investigator. Red-teams plans in active-tasks/*/BLACKBOARD.md for logical flaws, edge cases, and security risks. Handles analysis and research.",
         "temperature": 0.0,
         "prompt_path": ".profiles/investigator.md",
         "permissions": {
@@ -72,7 +72,7 @@ DEFAULT_PERSONAS = {
         },
     },
     "programmer": {
-        "role": "Implementation, build, verification",
+        "role": "FRAM Programmer. Reads the approved plan from BLACKBOARD.md, implements code in [task-name]-source/, builds and verifies in [task-name]-output/. Maintains workspace config/skill files.",
         "temperature": 0.5,
         "prompt_path": ".profiles/programmer.md",
         "permissions": {
@@ -703,7 +703,9 @@ def scaffold_agents_md(root: Path) -> None:
         return
 
     agents_path.write_text(
-        "# FRAM Workspace — System Rules\n\n"
+        "# SYSTEM ARCHITECTURE & AGENT REGISTRY\n\n"
+        "You are operating within a File-Routed Agentic Mesh (FRAM). The directory structure itself dictates your identity, boundaries, and communication pipeline.\n\n"
+        "> Template note: replace `<project-name>` below with your workspace name. This file is Layer 0 of the workspace — the shared identity and hard rules for every agent/harness that works here.\n\n"
         "## Workspace Path Map\n\n"
         "```\n"
         "<workspace-root>/\n"
@@ -718,26 +720,46 @@ def scaffold_agents_md(root: Path) -> None:
         "│   ├── invariants/              Rules that must hold true\n"
         "│   ├── relations/               Entity connections\n"
         "│   └── constraints/             Hard limits\n"
-        "└── active-tasks/                Task execution environment\n"
-        "    ├── shared-software/         READ-ONLY shared binaries\n"
-        "    └── <task-name>/             Isolated task\n"
-        "        ├── query.md             User's task contract\n"
-        "        ├── BLACKBOARD.md        Inter-agent communication\n"
-        "        ├── knowledge/           Per-task OKF knowledge\n"
-        "        ├── <task>-source/       DEVELOPMENT: mutable source\n"
-        "        └── <task>-output/       EXECUTION: build and verify\n"
+        "├── active-tasks/                Task execution environment\n"
+        "│   ├── shared-software/         READ-ONLY shared binaries\n"
+        "│   └── <task-name>/             Isolated task\n"
+        "│       ├── query.md             User's task contract\n"
+        "│       ├── BLACKBOARD.md        Inter-agent communication\n"
+        "│       ├── knowledge/           Per-task OKF knowledge\n"
+        "│       ├── target-software/     READ-ONLY: task-specific binaries"
+        "│       ├── <task>-source/       DEVELOPMENT: mutable source\n"
+        "│       ├── <task>-output/       EXECUTION: build and verify\n"
+        "│       └── mcp-scratchpad/      Temporary logs, debugger dumps, and tool outputs\n"
+        "└── .agents/\n"
+        "    └── skills/\n"
+        "        ├── grilling/            Grilling skill\n"
+        "        ├── icm-okf-gates/       ICM/OKF coupling skill (init, audit, self-check scripts)\n"
+        "        └── vocabulary/          Vocabulary skill\n"
         "```\n\n"
-        "## Agent Personas\n\n"
-        "- **Orchestrator**: Plans work, routes through Investigator gate, compiles final answer.\n"
-        "- **Investigator**: Red-teams plans, flags risks, handles analysis. Reviews before Programmer.\n"
-        "- **Programmer**: Implements code from approved plan, builds, runs verification.\n\n"
-        "## Hard Rules\n\n"
-        "1. **Sandbox Rule**: `shared-software/` and `target-software/` are READ-ONLY.\n"
-        "2. **Blackboard Protocol**: Agents communicate only through `BLACKBOARD.md`.\n"
-        "3. **Deterministic Gate**: Every stage must pass a deterministic check (exit code 0).\n"
-        "4. **Allowed Scope**: Source in `<task>-source/`, builds in `<task>-output/`.\n"
-        "5. **Knowledge Access**: Query `knowledge/index.md` for domain schemas and invariants.\n"
-        "6. **Layer 0/1 Conditional-Edit Rule**: Layer 0/1 files (`AGENTS.md`, `manifest.yaml`, `opencode.jsonc`) are editable by an agent only when (a) the user has defined the new entries beforehand and (b) the user has explicitly authorized the edit; the agent must confirm the authorization before editing. The runtime `edit` patterns for those files are gated `\"ask\"` in `opencode.jsonc`, so no such edit can happen silently.\n",
+        "*   **Routing note:** `manifest.yaml` is the human-readable declarative registry. The actual runtime routing lives in `opencode.jsonc` at the workspace root — opencode loads it (plus this `AGENTS.md`) when started in this directory. Non-opencode harnesses read `.profiles/*.md` and `README-HARNESS.template.md` instead.\n\n"
+        "## 2. AGENT PERSONAS & ROLES\n\n"
+        "*   **Orchestrator:** Reads `active-tasks/[task-name]/query.md`. Drafts a plan, routes it through the Investigator red-team gate, then dispatches to the Programmer. Compiles the final answer from `BLACKBOARD.md` and `*-output/` results. Never writes source code.\n"
+        "*   **Investigator:** Red-teams plans for logical flaws, edge cases, and security risks. Handles analysis and research. Writes review verdicts (`APPROVED` / `REVISED` / `BLOCKED`) to `BLACKBOARD.md`.\n"
+        "*   **Programmer:** Reads the Investigator-approved plan from `BLACKBOARD.md`. Implements code and tests in `[task-name]-source/`, builds and verifies in `[task-name]-output/`. Passes the deterministic gate before declaring completion.\n\n"
+        "## 3. FILE TRAVERSAL & COMMUNICATION POLICIES\n\n"
+        "Hard rules to prevent agents from stepping on each other or getting lost:\n\n"
+        "*   **Context Shifting:** Identity is tied to location. When a task shifts from analysis to coding, the active directory path shifts to that specific sub-folder.\n"
+        "*   **The Sandbox Rule (`shared-software/`, `target-software/`):** Agents may NEVER modify, delete, or rewrite files inside these directories. They may only copy or read them.\n"
+        "*   **The Workspace Rule (`[task-name]-source/`):** The development bench. Create, edit, and manage clean source code here. Do not execute untrusted binaries here.\n"
+        "*   **The Execution Rule (`[task-name]-output/`):** The live test track. Copy compiled software, proxies, and dependencies here to execute, test, and run them safely.\n"
+        "*   **The Blackboard Protocol (`BLACKBOARD.md`):** Agents do not talk directly.\n"
+        "    1. The *Investigator* dumps findings (hex addresses, function names, byte arrays, and other information) in the Blackboard.\n"
+        "    2. The *Programmer* reads the information to write tools or software.\n"
+        "    3. The *Orchestrator* checks the Blackboard file to see who is finished.\n"
+        "    **Knowledge Access**: Query `knowledge/index.md` for domain schemas and invariants.\n"
+        "    **Layer 0/1 Conditional-Edit Rule**: Layer 0/1 files (`AGENTS.md`, `manifest.yaml`, `opencode.jsonc`) are editable by an agent only when (a) the user has defined the new entries beforehand and (b) the user has explicitly authorized the edit; the agent must confirm the authorization before editing. The runtime `edit` patterns for those files are gated `\"ask\"` in `opencode.jsonc`, so no such edit can happen silently.\n",
+        "*   **The Deterministic Gate:** No task or stage may complete through probabilistic model assertions alone. Every gate requires a deterministic command returning exit code 0.\n\n"
+        "## Critical Tooling Rules\n\n"
+        "*   **Python Environment Management:** Always use `uv` instead of standard `pip` or `venv` commands (e.g., `uv pip install`, `uv run`).\n"
+        "*   **Package Modification:** Always ask for confirmation before installing/removing packages.\n"
+        "## Key Operational Constraints\n\n"
+        "*   **Never:** Force push to protected branches.\n"
+        "*   **Never:** Hardcode or commit secrets, `.env` files, or credentials.\n"
         encoding="utf-8",
     )
 
